@@ -4,7 +4,7 @@ import asyncHandler from "express-async-handler";
 /* CREATE BRAND */
 
 export const createBrand = asyncHandler(async (req, res) => {
-  const { name, field, logo } = req.body;
+  const { name, field, logo, facebookPageId, facebookAccessToken } = req.body;
 
   const existingBrand = await Brand.findOne({
     name,
@@ -21,6 +21,11 @@ export const createBrand = asyncHandler(async (req, res) => {
     field,
     logo,
     ownerId: req.user._id,
+
+    facebook: {
+      pageId: facebookPageId,
+      accessToken: facebookAccessToken,
+    },
   });
 
   res.status(201).json(brand);

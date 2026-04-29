@@ -21,6 +21,27 @@ const brandSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
+    // 🔥 NEW: SOCIAL ACCOUNTS
+    facebook: {
+      pageId: String,
+      accessToken: String,
+    },
+
+    instagram: {
+      pageId: String,
+      accessToken: String,
+    },
+
+    x: {
+      username: String,
+      apiKey: String,
+    },
+
+    youtube: {
+      channelId: String,
+      accessToken: String,
+    },
   },
   { timestamps: true },
 );

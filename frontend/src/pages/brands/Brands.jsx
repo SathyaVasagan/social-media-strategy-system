@@ -26,7 +26,6 @@ const Brands = () => {
   const fetchBrands = async () => {
     try {
       const data = await getBrands();
-
       setBrands(data);
     } catch {
       toast.error("Failed to load brands");
@@ -75,7 +74,7 @@ const Brands = () => {
 
   return (
     <div>
-      {/* Header */}
+      {/* HEADER */}
 
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Brands</h2>
@@ -88,16 +87,23 @@ const Brands = () => {
             className="p-2 border rounded-lg"
           />
 
+          {/* 🚀 PREMIUM BUTTON */}
           <button
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="
+              bg-gradient-to-r from-blue-600 to-cyan-500
+              text-white px-5 py-2.5 rounded-xl
+              shadow-md hover:shadow-xl
+              hover:scale-105 active:scale-95
+              transition-all duration-200
+            "
           >
             + Add Brand
           </button>
         </div>
       </div>
 
-      {/* Brand Grid */}
+      {/* BRAND GRID */}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredBrands.map((brand) => (
@@ -109,26 +115,13 @@ const Brands = () => {
         ))}
       </div>
 
-      {/* Add Brand Modal */}
+      {/* ADD BRAND MODAL */}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <GlassCard className="max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">Create Brand</h3>
-
-            <BrandForm onCreate={handleCreate} />
-
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-gray-500 mt-4"
-            >
-              Cancel
-            </button>
-          </GlassCard>
-        </div>
+        <BrandForm onCreate={handleCreate} onClose={() => setShowForm(false)} />
       )}
 
-      {/* Confirm Delete Dialog */}
+      {/* CONFIRM DELETE */}
 
       {confirmId && (
         <ConfirmDialog

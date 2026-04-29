@@ -1,8 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
+import "./workers/postWorker.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import brandRoutes from "./routes/brandRoutes.js";
@@ -14,25 +17,46 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 
 import { errorHandler } from "./middleware/errorMiddleware.js";
 
-dotenv.config();
+import { initBullBoard } from "./utils/bullBoard.js";
+import { recoverMissedJobs } from "./jobs/recoveryService.js";
 
-connectDB();
+const startServer = async () => {
+  try {
+    await connectDB();
 
-const app = express();
+    const app = express();
 
-app.use(cors());
-app.use(express.json());
+    app.use(cors());
+    app.use(express.json());
 
-app.use("/api/auth", authRoutes);
-app.use("/api/brands", brandRoutes);
-app.use("/api/calendar", calendarRoutes);
-app.use("/api/posts", postRoutes);
-app.use("/api/backlinks", backlinkRoutes);
-app.use("/api/analytics", analyticsRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+    // 🔥 Bull Board
+    const serverAdapter = initBullBoard();
+    app.use("/admin/queues", serverAdapter.getRouter());
 
-app.use(errorHandler);
+    // 🔥 Routes
+    app.use("/api/auth", authRoutes);
+    app.use("/api/brands", brandRoutes);
+    app.use("/api/calendar", calendarRoutes);
+    app.use("/api/posts", postRoutes);
+    app.use("/api/backlinks", backlinkRoutes);
+    app.use("/api/analytics", analyticsRoutes);
+    app.use("/api/dashboard", dashboardRoutes);
 
-const PORT = process.env.PORT || 5000;
+    app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, async () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📊 Bull Board: http://localhost:${PORT}/admin/queues`);
+
+      // 🔥 Recovery
+      await recoverMissedJobs();
+    });
+  } catch (error) {
+    console.error("❌ SERVER START ERROR:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

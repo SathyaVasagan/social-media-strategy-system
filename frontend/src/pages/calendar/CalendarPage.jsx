@@ -32,8 +32,7 @@ const CalendarPage = () => {
   const [editingEntry, setEditingEntry] = useState(null);
 
   const [dayEntries, setDayEntries] = useState([]);
-
-  const [viewEntry, setViewEntry] = useState(null); // floating detail
+  const [viewEntry, setViewEntry] = useState(null);
 
   const fetchEntries = async () => {
     try {
@@ -48,8 +47,7 @@ const CalendarPage = () => {
     fetchEntries();
   }, []);
 
-  /* entries for selected date */
-
+  /* FILTER BY DATE */
   const getEntriesForDate = (date) => {
     return entries.filter((entry) => {
       const d = new Date(entry.date);
@@ -61,47 +59,38 @@ const CalendarPage = () => {
     });
   };
 
-  /* click date */
-
+  /* DATE CLICK */
   const handleDateClick = (date) => {
     const items = getEntriesForDate(date);
-
     setSelectedDate(date);
     setDayEntries(items);
   };
 
-  /* save entry */
-
+  /* SAVE */
   const handleSave = async (form) => {
     try {
       if (editingEntry) {
         const updated = await updateCalendarEntry(editingEntry._id, form);
-
         setEntries(entries.map((e) => (e._id === updated._id ? updated : e)));
-
         toast.success("Entry updated");
       } else {
         const newEntry = await createCalendarEntry({
           ...form,
           brandId,
         });
-
         setEntries([newEntry, ...entries]);
-
         toast.success("Entry created");
       }
 
       setModalOpen(false);
       setEditingEntry(null);
-
       fetchEntries();
     } catch {
       toast.error("Action failed");
     }
   };
 
-  /* delete */
-
+  /* DELETE */
   const handleDelete = async (id) => {
     try {
       await deleteCalendarEntry(id);
@@ -124,13 +113,20 @@ const CalendarPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Content Calendar</h2>
 
+        {/* 🚀 PREMIUM BUTTON */}
         <button
           onClick={() => {
             setEditingEntry(null);
             setSelectedDate(new Date());
             setModalOpen(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="
+            bg-gradient-to-r from-blue-600 to-cyan-500
+            text-white px-5 py-2.5 rounded-xl
+            shadow-md hover:shadow-xl
+            hover:scale-105 active:scale-95
+            transition-all duration-200
+          "
         >
           Schedule Content
         </button>
@@ -178,11 +174,14 @@ const CalendarPage = () => {
                 <div
                   key={entry._id}
                   onClick={() => setViewEntry(entry)}
-                  className="border rounded p-3 mb-3 cursor-pointer hover:bg-gray-50"
+                  className="
+                    border rounded-xl p-3 mb-3 cursor-pointer
+                    hover:bg-white/60 hover:shadow-md
+                    transition-all duration-200
+                  "
                 >
                   <div className="flex justify-between items-center">
                     <h4 className="font-medium">{entry.title}</h4>
-
                     <div className={`w-3 h-3 rounded-full ${color}`} />
                   </div>
 
@@ -199,7 +198,7 @@ const CalendarPage = () => {
       {/* FLOATING DETAILS */}
 
       {viewEntry && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <GlassCard className="w-full max-w-md p-6">
             <h3 className="text-lg font-semibold mb-2">{viewEntry.title}</h3>
 
@@ -217,40 +216,39 @@ const CalendarPage = () => {
 
             <p className="text-sm mb-4">{viewEntry.description}</p>
 
-            <div className="flex justify-between">
+            {/* 🚀 FIXED BUTTON SECTION */}
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setViewEntry(null)}
-                className="text-gray-600"
+                className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 transition"
               >
                 Close
               </button>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setEditingEntry(viewEntry);
-                    setSelectedDate(new Date(viewEntry.date));
-                    setModalOpen(true);
-                    setViewEntry(null);
-                  }}
-                  className="text-blue-600"
-                >
-                  Edit
-                </button>
+              <button
+                onClick={() => {
+                  setEditingEntry(viewEntry);
+                  setSelectedDate(new Date(viewEntry.date));
+                  setModalOpen(true);
+                  setViewEntry(null);
+                }}
+                className="text-blue-600 font-medium"
+              >
+                Edit
+              </button>
 
-                <button
-                  onClick={() => handleDelete(viewEntry._id)}
-                  className="text-red-600"
-                >
-                  Delete
-                </button>
-              </div>
+              <button
+                onClick={() => handleDelete(viewEntry._id)}
+                className="text-red-600 font-medium"
+              >
+                Delete
+              </button>
             </div>
           </GlassCard>
         </div>
       )}
 
-      {/* CREATE / EDIT MODAL */}
+      {/* MODAL */}
 
       {modalOpen && (
         <CalendarModal

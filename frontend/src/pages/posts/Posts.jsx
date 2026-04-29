@@ -33,15 +33,33 @@ const Posts = () => {
     fetchPosts();
   }, [brandId]);
 
+  // 🔥 AUTO REFRESH EVERY 5s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPosts();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [brandId]);
+
+  /* 🚀 GLOBAL UPDATE HANDLER (IMMUTABLE) */
+  const handleUpdatePost = (updatedPost) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p._id === updatedPost._id ? { ...p, ...updatedPost } : p,
+      ),
+    );
+  };
+
   const handleCreate = async (form) => {
     try {
-      const newPost = await createPost(form);
+      await createPost(form);
 
-      setPosts([newPost, ...posts]);
+      await fetchPosts();
 
       setShowForm(false);
 
-      toast.success("Post created");
+      toast.success("Post is being processed...");
     } catch {
       toast.error("Create failed");
     }
@@ -51,7 +69,7 @@ const Posts = () => {
     try {
       await deletePost(id);
 
-      setPosts(posts.filter((p) => p._id !== id));
+      setPosts((prev) => prev.filter((p) => p._id !== id));
 
       toast.success("Post deleted");
     } catch {
@@ -61,14 +79,15 @@ const Posts = () => {
 
   if (loading) return <LoadingSkeleton />;
 
-  /* PIPELINE SUMMARY */
+  /* SUMMARY */
 
   const total = posts.length;
   const draft = posts.filter((p) => p.status === "Draft").length;
+  const processing = posts.filter((p) => p.status === "Processing").length;
   const scheduled = posts.filter((p) => p.status === "Scheduled").length;
   const posted = posts.filter((p) => p.status === "Posted").length;
 
-  /* FILTER LOGIC */
+  /* FILTER */
 
   let filteredPosts = posts;
 
@@ -83,7 +102,6 @@ const Posts = () => {
   return (
     <div>
       {/* HEADER */}
-
       <div className="flex justify-between mb-6">
         <h2 className="text-2xl font-bold">Posts</h2>
 
@@ -95,9 +113,8 @@ const Posts = () => {
         </button>
       </div>
 
-      {/* SUMMARY CARDS */}
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      {/* SUMMARY */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <GlassCard>
           <p className="text-sm text-gray-500">Total</p>
           <p className="text-2xl font-bold">{total}</p>
@@ -109,8 +126,13 @@ const Posts = () => {
         </GlassCard>
 
         <GlassCard>
+          <p className="text-sm text-gray-500">Processing</p>
+          <p className="text-2xl font-bold text-blue-500">{processing}</p>
+        </GlassCard>
+
+        <GlassCard>
           <p className="text-sm text-gray-500">Scheduled</p>
-          <p className="text-2xl font-bold text-blue-600">{scheduled}</p>
+          <p className="text-2xl font-bold text-blue-700">{scheduled}</p>
         </GlassCard>
 
         <GlassCard>
@@ -119,28 +141,19 @@ const Posts = () => {
         </GlassCard>
       </div>
 
-      {/* FILTER BAR */}
-
+      {/* FILTER */}
       <div className="flex flex-wrap gap-4 items-center mb-6">
-        {/* STATUS FILTER */}
-
-        <div className="flex gap-2">
-          {["All", "Draft", "Scheduled", "Posted"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1 rounded text-sm ${
-                statusFilter === status
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200"
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
-
-        {/* PLATFORM FILTER */}
+        {["All", "Draft", "Processing", "Scheduled", "Posted"].map((status) => (
+          <button
+            key={status}
+            onClick={() => setStatusFilter(status)}
+            className={`px-3 py-1 rounded text-sm ${
+              statusFilter === status ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            {status}
+          </button>
+        ))}
 
         <select
           value={platformFilter}
@@ -155,31 +168,25 @@ const Posts = () => {
         </select>
       </div>
 
-      {/* POSTS GRID */}
-
+      {/* POSTS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredPosts.map((post) => (
-          <PostCard key={post._id} post={post} onDelete={handleDelete} />
+          <PostCard
+            key={post._id}
+            post={post}
+            onDelete={handleDelete}
+            onUpdate={handleUpdatePost}
+          />
         ))}
       </div>
 
-      {/* CREATE MODAL */}
-
+      {/* MODAL */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <GlassCard className="max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Create Post</h3>
-
-            <PostForm brandId={brandId} onCreate={handleCreate} />
-
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-red-500 mt-4"
-            >
-              Cancel
-            </button>
-          </GlassCard>
-        </div>
+        <PostForm
+          brandId={brandId}
+          onCreate={handleCreate}
+          onClose={() => setShowForm(false)}
+        />
       )}
     </div>
   );

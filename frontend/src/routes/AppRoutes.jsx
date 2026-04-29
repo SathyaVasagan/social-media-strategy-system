@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../layout/DashboardLayout";
@@ -21,116 +21,53 @@ import BacklinkDetails from "../pages/backlinks/BacklinkDetails";
 
 import Analytics from "../pages/analytics/Analytics";
 
+/* WRAPPER FOR PROTECTED + LAYOUT */
+
+const ProtectedLayout = () => {
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <Outlet />
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* PUBLIC ROUTES */}
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected routes with dashboard layout */}
+      {/* PROTECTED ROUTES */}
 
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Home />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+      <Route element={<ProtectedLayout />}>
+        <Route path="/" element={<Home />} />
 
-      <Route
-        path="/brands"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Brands />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/brands" element={<Brands />} />
+        <Route path="/brand" element={<Navigate to="/brands" />} />
 
-      <Route path="/brand" element={<Navigate to="/brands" />} />
+        <Route path="/brand/:brandId" element={<Workspace />} />
 
-      <Route
-        path="/brand/:brandId"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Workspace />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/brand/:brandId/calendar" element={<CalendarPage />} />
 
-      <Route
-        path="/brand/:brandId/calendar"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <CalendarPage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/brand/:brandId/posts" element={<Posts />} />
+        <Route path="/brand/:brandId/posts/:postId" element={<PostDetails />} />
 
-      <Route
-        path="/brand/:brandId/posts"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Posts />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/brand/:brandId/backlinks" element={<Backlinks />} />
+        <Route
+          path="/brand/:brandId/backlinks/:id"
+          element={<BacklinkDetails />}
+        />
 
-      <Route
-        path="/brand/:brandId/posts/:postId"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <PostDetails />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/brand/:brandId/analytics" element={<Analytics />} />
+      </Route>
 
-      <Route
-        path="/brand/:brandId/backlinks"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Backlinks />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+      {/* FALLBACK */}
 
-      <Route
-        path="/brand/:brandId/backlinks/:id"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <BacklinkDetails />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/brand/:brandId/analytics"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Analytics />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };

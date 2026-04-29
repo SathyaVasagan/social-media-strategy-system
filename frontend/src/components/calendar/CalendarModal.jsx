@@ -36,13 +36,12 @@ const CalendarModal = ({ selectedDate, onSave, onClose, existing }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     onSave(form);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-      <GlassCard className="w-full max-w-md">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+      <GlassCard hover={false} className="w-full max-w-md">
         <h3 className="text-lg font-semibold mb-4">
           {existing ? "Edit Content Plan" : "Add Content Plan"}
         </h3>
@@ -51,85 +50,113 @@ const CalendarModal = ({ selectedDate, onSave, onClose, existing }) => {
           Date: {selectedDate.toDateString()}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="date"
-            name="date"
-            required
-            value={form.date}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded ${
-              form.date ? "text-black" : "text-gray-400"
-            }`}
-          />
+        {/* 🚀 UPGRADED FORM */}
+        <div className="relative max-h-[70vh]">
+          {/* SCROLL CONTAINER */}
+          <div className="max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* DATE */}
+              <div>
+                <label className="form-label">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={form.date}
+                  onChange={handleChange}
+                  className="input-field"
+                  required
+                />
+              </div>
 
-          <input
-            name="title"
-            placeholder="Post Title"
-            required
-            value={form.title}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
+              {/* TITLE */}
+              <div>
+                <label className="form-label">Post Title</label>
+                <input
+                  name="title"
+                  placeholder="Enter post title..."
+                  value={form.title}
+                  onChange={handleChange}
+                  className="input-field"
+                  required
+                />
+              </div>
 
-          <select
-            name="postType"
-            required
-            value={form.postType}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded ${
-              form.postType ? "text-black" : "text-gray-400"
-            }`}
-          >
-            <option value="" disabled>
-              Select Post Type
-            </option>
-            <option value="Static">Static</option>
-            <option value="Carousel">Carousel</option>
-            <option value="Reel">Reel</option>
-            <option value="Video">Video</option>
-          </select>
+              {/* TYPE + PLATFORM */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="form-label">Post Type</label>
+                  <select
+                    name="postType"
+                    value={form.postType}
+                    onChange={handleChange}
+                    className="select-field"
+                    required
+                  >
+                    <option value="">Select type</option>
+                    <option value="Static">Static</option>
+                    <option value="Carousel">Carousel</option>
+                    <option value="Reel">Reel</option>
+                    <option value="Video">Video</option>
+                  </select>
+                </div>
 
-          <select
-            name="platform"
-            required
-            value={form.platform}
-            onChange={handleChange}
-            className={`w-full p-2 border rounded ${
-              form.platform ? "text-black" : "text-gray-400"
-            }`}
-          >
-            <option value="" disabled>
-              Select Platform
-            </option>
-            <option value="Instagram">Instagram</option>
-            <option value="Facebook">Facebook</option>
-            <option value="X">X</option>
-            <option value="YouTube">YouTube</option>
-          </select>
+                <div>
+                  <label className="form-label">Platform</label>
+                  <select
+                    name="platform"
+                    value={form.platform}
+                    onChange={handleChange}
+                    className="select-field"
+                    required
+                  >
+                    <option value="">Select platform</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="X">X</option>
+                    <option value="YouTube">YouTube</option>
+                  </select>
+                </div>
+              </div>
 
-          <textarea
-            name="description"
-            placeholder="Description"
-            required
-            value={form.description}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
+              {/* DESCRIPTION */}
+              <div>
+                <label className="form-label">Description</label>
+                <textarea
+                  name="description"
+                  placeholder="Write content plan..."
+                  value={form.description}
+                  onChange={handleChange}
+                  className="textarea-field"
+                  required
+                />
+              </div>
 
-          <div className="flex justify-between">
-            <button type="button" onClick={onClose} className="text-gray-600">
-              Cancel
-            </button>
+              {/* ACTION BUTTONS */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 rounded border border-gray-300 text-red-500 hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
 
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              Save
-            </button>
+                <button
+                  type="submit"
+                  className="
+                bg-gradient-to-r from-blue-600 to-cyan-500
+                text-white px-5 py-2.5 rounded-xl
+                shadow-md hover:shadow-xl
+                hover:scale-105 active:scale-95
+                transition-all duration-200
+              "
+                >
+                  {existing ? "Update" : "Save"}
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </GlassCard>
     </div>
   );

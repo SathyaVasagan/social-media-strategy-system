@@ -1,18 +1,17 @@
-const GlassCard = ({ children, className = "", onClick }) => {
+const GlassCard = ({ children, className = "", onClick, hover = true }) => {
   return (
     <div
       onClick={onClick}
       className={`
         relative
-        backdrop-blur-xl
-        bg-white/40
-        border border-white/30
-        rounded-xl
+        overflow-hidden
+        rounded-3xl
+        border border-gray-200
+        bg-white
         shadow-md
-        hover:shadow-2xl
-        hover:-translate-y-2
         transition-all duration-300 ease-out
         p-6
+        ${hover ? "hover:shadow-xl hover:-translate-y-1" : ""}
         ${onClick ? "cursor-pointer" : ""}
         ${className}
       `}

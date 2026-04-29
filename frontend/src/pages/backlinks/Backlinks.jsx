@@ -61,14 +61,14 @@ const Backlinks = () => {
 
   if (loading) return <LoadingSkeleton />;
 
-  /* HEALTH SUMMARY */
+  /* SUMMARY */
 
   const total = backlinks.length;
   const live = backlinks.filter((b) => b.status === "Live").length;
   const removed = backlinks.filter((b) => b.status === "Removed").length;
   const platforms = [...new Set(backlinks.map((b) => b.platform))];
 
-  /* FILTER LOGIC */
+  /* FILTER */
 
   let filteredBacklinks = backlinks;
 
@@ -87,7 +87,6 @@ const Backlinks = () => {
   return (
     <div>
       {/* HEADER */}
-
       <div className="flex justify-between mb-6">
         <h2 className="text-2xl font-bold">Backlinks</h2>
 
@@ -100,7 +99,6 @@ const Backlinks = () => {
       </div>
 
       {/* SUMMARY CARDS */}
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <GlassCard>
           <p className="text-sm text-gray-500">Total Links</p>
@@ -123,11 +121,8 @@ const Backlinks = () => {
         </GlassCard>
       </div>
 
-      {/* FILTER BAR */}
-
+      {/* FILTER */}
       <div className="flex flex-wrap gap-4 items-center mb-4">
-        {/* STATUS FILTER */}
-
         <div className="flex gap-2">
           {["All", "Live", "Removed"].map((status) => (
             <button
@@ -144,8 +139,6 @@ const Backlinks = () => {
           ))}
         </div>
 
-        {/* PLATFORM FILTER */}
-
         <select
           value={platformFilter}
           onChange={(e) => setPlatformFilter(e.target.value)}
@@ -160,26 +153,15 @@ const Backlinks = () => {
       </div>
 
       {/* TABLE */}
-
       <BacklinkTable backlinks={filteredBacklinks} onDelete={handleDelete} />
 
       {/* MODAL */}
-
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <GlassCard className="max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Create Backlink</h3>
-
-            <BacklinkForm brandId={brandId} onCreate={handleCreate} />
-
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-red-500 mt-4"
-            >
-              Cancel
-            </button>
-          </GlassCard>
-        </div>
+        <BacklinkForm
+          brandId={brandId}
+          onCreate={handleCreate}
+          onClose={() => setShowForm(false)}
+        />
       )}
     </div>
   );

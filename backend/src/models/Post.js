@@ -5,42 +5,44 @@ const postSchema = mongoose.Schema(
     brandId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
-    },
-
-    title: {
-      type: String,
       required: true,
     },
 
+    title: { type: String, required: true },
+
     postType: {
       type: String,
+      enum: ["Static", "Carousel", "Reel", "Video"],
       required: true,
     },
 
     platform: {
       type: String,
+      enum: ["Instagram", "Facebook", "X", "YouTube"],
       required: true,
     },
 
-    caption: {
-      type: String,
-      required: true,
-    },
+    caption: { type: String, required: true },
 
-    mediaLink: {
-      type: String,
-      required: true,
-    },
+    mediaUrls: [String],
 
-    scheduledDate: {
+    scheduledAt: {
       type: Date,
       required: true,
     },
 
+    jobId: { type: String },
+
+    externalPostId: { type: String },
+
     status: {
       type: String,
-      required: true,
+      enum: ["Draft", "Processing", "Scheduled", "Posted", "Failed"],
+      default: "Processing",
+      index: true,
     },
+
+    errorMessage: String,
   },
   { timestamps: true },
 );
